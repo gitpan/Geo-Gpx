@@ -1,0 +1,6 @@
+Revision history for Geo-Gpx
+
+0.11.0  Mon Sep 11 19:38:37 2006
+        Implement complete support for parsing and generating GPX 1.0
+        and 1.1 documents
+
