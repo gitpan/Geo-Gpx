@@ -10,7 +10,10 @@ use Date::Parse;
 use Date::Format;
 use Scalar::Util qw(blessed);
 
-use version; our $VERSION = qv('0.12');
+BEGIN {
+	use vars qw ($VERSION);
+	$VERSION     = 0.13;
+}
 
 # TODO:
 #   Make xml() able to output to a filehandle
@@ -596,7 +599,7 @@ Geo::Gpx - Create and parse GPX files.
 
 =head1 VERSION
 
-This document describes Geo::Gpx version 0.12
+This document describes Geo::Gpx version 0.13
 
 =head1 SYNOPSIS
 
@@ -618,7 +621,7 @@ This document describes Geo::Gpx version 0.12
 =head1 DESCRIPTION
 
 The original goal of this module was to produce GPX/XML files which were
-parseable by both GPX Spinner and EasyGPS. As of version 0.12 it has
+parseable by both GPX Spinner and EasyGPS. As of version 0.13 it has
 been extended to support general parsing and generation of GPX data. GPX
 1.0 and 1.1 are supported.
 
