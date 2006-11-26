@@ -10,7 +10,7 @@ use Date::Parse;
 use Date::Format;
 use Scalar::Util qw(blessed);
 
-use version; our $VERSION = qv('0.11.0');
+use version; our $VERSION = qv('0.12');
 
 # TODO:
 #   Make xml() able to output to a filehandle
@@ -286,6 +286,13 @@ sub _parse {
 # Not a method
 sub _iterate_points {
     my $pts = shift || [ ];        # array ref
+    
+    unless (defined($pts)) {
+        return sub {
+            return;
+        };
+    }
+    
     my $max = scalar(@{$pts});
     my $pos = 0;
     return sub {
@@ -310,10 +317,6 @@ sub _iterate_iterators {
 # Return an iterator that visits each of the waypoints
 sub iterate_waypoints {
     my $self = shift;
-    
-    return sub { return undef } 
-        unless exists $self->{waypoints};
-        
     return _iterate_points($self->{waypoints});
 }
 
@@ -323,8 +326,7 @@ sub iterate_routepoints {
     my @iter = ( );
     if (exists($self->{routes})) {
         for my $rte (@{$self->{routes}}) {
-            push @iter, _iterate_points($rte->{points})
-                if exists($rte->{points});
+            push @iter, _iterate_points($rte->{points});
         }
     }
     
@@ -416,7 +418,7 @@ sub _xml {
         # render themselves. Note that Gpx::Cache->xml
         # adds the <wpt></wpt> wrapper - so this won't
         # work correctly for trkpt and rtept
-        return $value->xml();
+        return $value->xml($name);
     } elsif (defined(my $enc = $self->{encoder}->{$name})) {
         return $enc->($name, $value);
     } elsif (ref($value) eq 'HASH') {
@@ -548,7 +550,7 @@ sub xml {
     return join('', @ret);
 }
 
-#### Legacy methods from 0.10.0
+#### Legacy methods from 0.10
 
 sub gpx {
     my $self = shift;
@@ -594,11 +596,11 @@ Geo::Gpx - Create and parse GPX files.
 
 =head1 VERSION
 
-This document describes Geo::Gpx version 0.11.0
+This document describes Geo::Gpx version 0.12
 
 =head1 SYNOPSIS
 
-    # Version 0.10.0 compaibility
+    # Version 0.10 compaibility
     use Geo::Gpx;
     my $gpx = Geo::Gpx->new( @waypoints );
     my $xml = $gpx->xml;
@@ -616,7 +618,7 @@ This document describes Geo::Gpx version 0.11.0
 =head1 DESCRIPTION
 
 The original goal of this module was to produce GPX/XML files which were
-parseable by both GPX Spinner and EasyGPS. As of version 0.11.0 it has
+parseable by both GPX Spinner and EasyGPS. As of version 0.12 it has
 been extended to support general parsing and generation of GPX data. GPX
 1.0 and 1.1 are supported.
 
@@ -946,7 +948,7 @@ If the version is omitted it defaults to the value of the C<version>
 attibute. Parsing a GPX document sets the version. If the C<version>
 attribute is unset defaults to 1.0.
 
-C<Geo::Gpx> version 0.10.0 used C<Geo::Cache> to render each of the
+C<Geo::Gpx> version 0.10 used C<Geo::Cache> to render each of the
 points. C<Geo::Cache> generates a number of hardwired values to suit the
 original application of that module which aren't appropriate for general
 purpose GPX manipulation. Legacy mode is triggered by passing a list of
@@ -955,15 +957,15 @@ for new applications.
 
 =item C<gpx>
 
-Synonym for C<xml()>. Provided for compatibility with version 0.10.0.
+Synonym for C<xml()>. Provided for compatibility with version 0.10.
 
 =item C<loc>
 
-Provided for compatibility with version 0.10.0. 
+Provided for compatibility with version 0.10. 
 
 =item C<gpsdrive>
 
-Provided for compatibility with version 0.10.0. 
+Provided for compatibility with version 0.10. 
 
 =back
 

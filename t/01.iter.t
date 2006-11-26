@@ -1,6 +1,6 @@
 # Test private iterator primitives
 
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 BEGIN {
     use_ok('Geo::Gpx');
@@ -28,3 +28,9 @@ my $i2 = Geo::Gpx::_iterate_points(\@ar2);
 my @r2 = drain_iter(Geo::Gpx::_iterate_iterators($i1, $i2));
 
 is_deeply(\@r2, \@ar3, '_iterate_iterators');
+
+my $gpx = Geo::Gpx->new();  # Empty
+
+my @r3 = drain_iter($gpx->iterate_points());
+
+is(scalar(@r3), 0, 'empty iterator');
