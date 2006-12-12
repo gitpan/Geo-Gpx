@@ -12,11 +12,12 @@ use Scalar::Util qw(blessed);
 
 BEGIN {
 	use vars qw ($VERSION);
-	$VERSION     = 0.13;
+	$VERSION     = 0.14;
 }
 
 # TODO:
 #   Make xml() able to output to a filehandle
+#   Make sure can() works properly for synthetic methods
 
 our $AUTOLOAD;
 
@@ -119,9 +120,11 @@ sub new {
         # New behaviour
         my %args = @args;
         $self->_init_shiny_new();
-        
-        if (exists $args{xml}) {
-            $self->_parse($args{xml});
+
+        if (exists $args{input}) {
+            $self->_parse($args{input});
+        } elsif (exists $args{xml}) {
+            $self->_parse(\$args{xml});
         }
     } else {
         croak("Invalid arguments");
@@ -159,10 +162,10 @@ sub _trim {
 }
 
 sub _parse {
-    my $self = shift;
-    my $xml  = shift;
+    my $self   = shift;
+    my $source = shift;
 
-    my $p = XML::Descent->new({ Input => \$xml });
+    my $p = XML::Descent->new({ Input => $source });
     
     $p->on(gpx => sub {
         my ($elem, $attr) = @_;
@@ -393,7 +396,7 @@ sub _tag {
     my $attr = shift || { };
     my @tag = ( '<',  $name );
 
-    # Sort keys so the tests don't depend on hash output order
+    # Sort keys so the tests can depend on hash output order
     for my $n (sort keys %{$attr}) {
         my $v = $attr->{$n};
         push @tag, ' ', $n, '="', _enc($v), '"';
@@ -599,7 +602,7 @@ Geo::Gpx - Create and parse GPX files.
 
 =head1 VERSION
 
-This document describes Geo::Gpx version 0.13
+This document describes Geo::Gpx version 0.14
 
 =head1 SYNOPSIS
 
@@ -615,6 +618,11 @@ This document describes Geo::Gpx version 0.13
 
     # Parse GPX
     my $gpx = Geo::Gpx->new( xml => $xml );
+    my $waypoints = $gpx->waypoints();
+    my $tracks = $gpx->tracks();
+
+    # Parse GPX from open file
+    my $gpx = Geo::Gpx->new( input => $fh );
     my $waypoints = $gpx->waypoints();
     my $tracks = $gpx->tracks();
 
@@ -641,6 +649,10 @@ converted into a GPX file. This behaviour is maintained by this release:
 New applications can use C<Geo::Gpx> to parse a GPX file:
 
     my $gpx = Geo::Gpx->new( xml => $gpx_document );
+    
+or from an open filehandle:
+
+    my $gpx = Geo::Gpx->new( input => $fh );
     
 or can create an empty container to which waypoints, routes and tracks can then be added:
 
