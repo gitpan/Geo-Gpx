@@ -73,6 +73,11 @@ sub normalise {
         return $tm;
     };
     $xml =~ s{(<time>)(.*?)(</time>)}{$1 . $fix_time->($2) . $3}eg;
+    my $fix_coord = sub {
+        my $co = shift;
+        return sprintf("%.6f", $co);
+    };
+    $xml =~ s{((?:lat|lon)=\")([^\"]+)(\")}{$1 . $fix_coord->($2) . $3}eg;
     $xml =~ s{<groundspeak:cache id="\d+"}{<groundspeak:cache id="99999"}g;
     return $xml;
 }

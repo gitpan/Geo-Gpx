@@ -8,4 +8,8 @@ Revision history for Geo-Gpx
         Added support for 'input' option that is passed through unchanged
         to XML::Descent. The old 'xml' option is still supported for legacy
         use.
-        
+
+0.15    2006-12-14
+        Minor documentation typos fixed.
+        Fixed problems due to differing numeric precision on different
+        platforms in t/03.gen-parse.t and t/04.legacy.t

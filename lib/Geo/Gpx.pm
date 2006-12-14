@@ -12,7 +12,7 @@ use Scalar::Util qw(blessed);
 
 BEGIN {
 	use vars qw ($VERSION);
-	$VERSION     = 0.14;
+	$VERSION     = 0.15;
 }
 
 # TODO:
@@ -602,11 +602,11 @@ Geo::Gpx - Create and parse GPX files.
 
 =head1 VERSION
 
-This document describes Geo::Gpx version 0.14
+This document describes Geo::Gpx version 0.15
 
 =head1 SYNOPSIS
 
-    # Version 0.10 compaibility
+    # Version 0.10 compatibility
     use Geo::Gpx;
     my $gpx = Geo::Gpx->new( @waypoints );
     my $xml = $gpx->xml;
@@ -806,7 +806,7 @@ may also be a C<Geo::Cache> instance in legacy mode):
     
 All fields apart from C<lat> and C<lon> are optional. See the GPX
 specification for an explanation of the fields. The waypoints array
-is an anonymouse array of such points:
+is an anonymous array of such points:
 
     $gpx->waypoints([ { lat => 57.0, lon => -2 }, { lat => 57.2, lon => -2.1 } ]);
 
