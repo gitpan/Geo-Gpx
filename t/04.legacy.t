@@ -1,19 +1,21 @@
+use strict;
+use warnings;
+use Geo::Gpx;
 use Test::More;
 
 BEGIN {
     eval "use Geo::Cache";
-    if ($@) {
-        plan skip_all => 'Geo::Cache not available';
-        exit;
-    }
-    plan tests => 2;
-    use_ok('Geo::Gpx');
+    plan skip_all => 'Geo::Cache not available' if $@;
+    eval "use Test::XML";
+    plan skip_all => 'Test::XML not available' if $@;
 }
+
+plan tests => 1;
 
 # Get expected output from previous version
 my $xml;
 { local $/; $xml = <DATA>; }
-$xml = normalise($xml);
+$xml = normalise( $xml );
 
 my @pts = (
     new Geo::Cache(
@@ -51,12 +53,13 @@ my @pts = (
     )
 );
 
-my $gpx = Geo::Gpx->new(@pts);
+my $gpx = Geo::Gpx->new( @pts );
 
 my $gxml = $gpx->xml();
-$gxml = normalise($gxml);
+$gxml = normalise( $gxml );
 
-is($gxml, $xml, 'same output as previous version');
+is_xml( $gxml, $xml, 'same output as previous version' );
+
 # if ($gxml ne $xml) {
 #     save('orig.gpx', $xml);
 #     save('gen.gpx',  $gxml);
@@ -64,6 +67,7 @@ is($gxml, $xml, 'same output as previous version');
 
 sub normalise {
     my $xml = shift;
+
     # Remove leading spaces in case we decide to indent the output
     $xml =~ s{^\s+}{}msg;
     my $fix_time = sub {
@@ -75,18 +79,23 @@ sub normalise {
     $xml =~ s{(<time>)(.*?)(</time>)}{$1 . $fix_time->($2) . $3}eg;
     my $fix_coord = sub {
         my $co = shift;
-        return sprintf("%.6f", $co);
+        return sprintf( "%.6f", $co );
     };
     $xml =~ s{((?:lat|lon)=\")([^\"]+)(\")}{$1 . $fix_coord->($2) . $3}eg;
     $xml =~ s{<groundspeak:cache id="\d+"}{<groundspeak:cache id="99999"}g;
+
+    # Oops :)
+    # That's a bug Geo::Cache - nothing to do with us.
+    $xml =~ s{</groundpeak:state>}{</groundspeak:state>}g;
+
     return $xml;
 }
 
 sub save {
-    my ($name, $xml) = @_;
-    open(my $fh, '>', $name) or die "Can't write $name ($!)\n";
+    my ( $name, $xml ) = @_;
+    open( my $fh, '>', $name ) or die "Can't write $name ($!)\n";
     print $fh $xml;
-    close($fh);
+    close( $fh );
 }
 
 __DATA__

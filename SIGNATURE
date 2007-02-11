@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 148fbd35740f477f60bbcb64c28e189f67df6f23 Changes
+SHA1 2ee9e97703156931ab7ddf683979c2c6a4384512 MANIFEST
+SHA1 7cf1d3a1c5a81ab78ded8e75761e56d22b1e3124 META.yml
+SHA1 713f8dd0252edbb91a87ac255726e3e5417affd9 Makefile.PL
+SHA1 5ccb77ed52ffaa4ff4dca1fee49af559ed4c85cf README
+SHA1 92f92258348a10189f46b5523efc25cf8477c641 doc/gpx-1.0.xsd
+SHA1 053ec21b34c2ddaa4a6ced67f7d5e6f781b56155 lib/Geo/Gpx.pm
+SHA1 f1024cc53e25e688a9412715072d1d51d1312d73 t/00.load.t
+SHA1 d6ab7736891a32740533d49186eb78509328de4f t/01.iter.t
+SHA1 2c811f330769a721394c30abcddeec6eb71bba6f t/02.cmp_ver.t
+SHA1 f9a63656821b1d42580325544366ab514d15e79c t/03.gen-parse.t
+SHA1 7abf141a3855afd676483de62c6781d9ffca3606 t/04.legacy.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (Darwin)
+
+iD8DBQFFzmwqwoknRJZQnCERAvXuAKDaVZ6TmcoYYCaWJYo3jR0uUBecXwCfZUUJ
+FtbzJSISvReiy5v8Wa3wsXk=
+=94mp
+-----END PGP SIGNATURE-----

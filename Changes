@@ -13,3 +13,7 @@ Revision history for Geo-Gpx
         Minor documentation typos fixed.
         Fixed problems due to differing numeric precision on different
         platforms in t/03.gen-parse.t and t/04.legacy.t
+
+0.16    2007-02-11
+        Fixed idiotic dependency on rand producing the same values given
+        the same seed on all platforms.
