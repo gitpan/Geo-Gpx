@@ -8,6 +8,7 @@ WriteMakefile(
     AUTHOR        => 'Andy Armstrong <andy@hexten.net>',
     VERSION_FROM  => 'lib/Geo/Gpx.pm',
     ABSTRACT_FROM => 'lib/Geo/Gpx.pm',
+    LICENSE       => 'perl',
     PL_FILES      => {},
     PREREQ_PM     => {
         'Test::More'     => 0,

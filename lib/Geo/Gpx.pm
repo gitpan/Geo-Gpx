@@ -12,7 +12,7 @@ use Scalar::Util qw(blessed);
 
 BEGIN {
     use vars qw ($VERSION);
-    $VERSION = 0.16;
+    $VERSION = 0.17;
 }
 
 # TODO:
@@ -656,7 +656,7 @@ Geo::Gpx - Create and parse GPX files.
 
 =head1 VERSION
 
-This document describes Geo::Gpx version 0.16
+This document describes Geo::Gpx version 0.17
 
 =head1 SYNOPSIS
 

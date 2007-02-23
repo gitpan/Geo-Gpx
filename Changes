@@ -17,3 +17,6 @@ Revision history for Geo-Gpx
 0.16    2007-02-11
         Fixed idiotic dependency on rand producing the same values given
         the same seed on all platforms.
+
+0.17    2007-02-23
+        Added machine readable licence.
