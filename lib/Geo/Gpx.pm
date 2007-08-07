@@ -10,24 +10,8 @@ use Date::Parse;
 use Date::Format;
 use Scalar::Util qw(blessed);
 
-BEGIN {
-    use vars qw ($VERSION);
-    $VERSION = 0.17;
-}
-
-# TODO:
-#   Make xml() able to output to a filehandle
-#   Make sure can() works properly for synthetic methods
-
-our $AUTOLOAD;
-
-my @META = qw(
-  name desc author time keywords copyright link
-);
-
-my @ATTR = qw(
-  waypoints tracks routes version
-);
+use vars qw ($VERSION);
+$VERSION = 0.18;
 
 # Values that are encoded as attributes
 my %AS_ATTR = (
@@ -52,8 +36,24 @@ my %XMLMAP = (
     }
 );
 
-my $ac = join( '|', @META, @ATTR );
-my $ACCESS = qr{^($ac)$};
+my @META;
+my @ATTR;
+
+BEGIN {
+    @META = qw( name desc author time keywords copyright link );
+    @ATTR = qw( waypoints tracks routes version );
+
+    # Generate accessors
+    for my $attr ( @META, @ATTR ) {
+        no strict 'refs';
+        *{ __PACKAGE__ . '::' . $attr } = sub {
+            my $self = shift;
+            # warn "get $name\n";
+            $self->{$attr} = shift if @_;
+            return $self->{$attr};
+        };
+    }
+}
 
 # For backwards compatibility
 sub _init_legacy {
@@ -85,7 +85,7 @@ sub _init_legacy {
             my $ts = time2str( '%Y-%m-%dT%H:%M:%S.0000000%z', $_[0] );
             $ts =~ s/(\d{2})$/:$1/;
             return $ts;
-          }
+        },
     };
 }
 
@@ -100,7 +100,7 @@ sub _init_shiny_new {
         },
         time => sub {
             return time2str( '%Y-%m-%dT%H:%M:%SZ', $_[0] );
-          }
+        },
     };
 }
 
@@ -108,7 +108,7 @@ sub new {
     my ( $class, @args ) = @_;
     my $self = bless( {}, $class );
 
-    $self->{time} = time();
+    $self->{time} = CORE::time();
 
     # Has to handle same calling convention as previous
     # version.
@@ -136,28 +136,6 @@ sub new {
     }
 
     return $self;
-}
-
-sub AUTOLOAD {
-    my $self = shift;
-    ( my $name = $AUTOLOAD ) =~ s/^.*://;
-    if ( my ( $obj ) = ( $name =~ $ACCESS ) ) {
-        if ( @_ ) {
-            return $self->{$obj} = $_[0];
-        }
-        else {
-            return $self->{$obj};
-        }
-    }
-    else {
-        croak( "Undefined accessor method: $name" );
-    }
-}
-
-sub DESTROY {
-
-    # Do nothing - but if we don't define it here it gets passed to
-    # AUTOLOAD
 }
 
 # Not a method
@@ -234,21 +212,18 @@ sub _parse {
                 $p->on(
                     url => sub {
                         my ( $elem, $attr, $ctx ) = @_;
-                        $ctx->{link} ||= {};
                         $ctx->{link}->{href} = _trim( $p->text() );
                     }
                 );
                 $p->on(
                     urlname => sub {
                         my ( $elem, $attr, $ctx ) = @_;
-                        $ctx->{link} ||= {};
                         $ctx->{link}->{text} = _trim( $p->text() );
                     }
                 );
                 $p->on(
                     author => sub {
                         my ( $elem, $attr, $ctx ) = @_;
-                        $ctx->{author} ||= {};
                         $ctx->{author}->{name} = _trim( $p->text() );
                     }
                 );
@@ -257,7 +232,6 @@ sub _parse {
                         my ( $elem, $attr, $ctx ) = @_;
                         my $em = _trim( $p->text() );
                         if ( $em =~ m{^(.+)\@(.+)$} ) {
-                            $ctx->{author} ||= {};
                             $ctx->{author}->{email} = {
                                 id     => $1,
                                 domain => $2
@@ -330,6 +304,21 @@ sub _parse {
     );
 
     $p->walk();
+}
+
+sub add_waypoint {
+    my $self = shift;
+
+    for my $wpt ( @_ ) {
+        eval { keys %$wpt };
+        croak "waypoint argument must be a hash reference"
+          if $@;
+
+        croak "'lat' and 'lon' keys are mandatory in waypoint hash"
+          unless exists $wpt->{lon} && exists $wpt->{lat};
+
+        push @{ $self->{waypoints} }, $wpt;
+    }
 }
 
 # Not a method
@@ -474,13 +463,13 @@ sub _xml {
     elsif ( defined( my $enc = $self->{encoder}->{$name} ) ) {
         return $enc->( $name, $value );
     }
-    elsif ( ref( $value ) eq 'HASH' ) {
+    elsif ( ref $value eq 'HASH' ) {
         my $attr    = {};
         my @cont    = ( "\n" );
         my $as_attr = $AS_ATTR{$name};
 
         for my $k ( sort keys %{$value} ) {
-            if ( defined( $as_attr ) && $k =~ $as_attr ) {
+            if ( defined $as_attr && $k =~ $as_attr ) {
                 $attr->{$k} = $value->{$k};
             }
             else {
@@ -490,8 +479,8 @@ sub _xml {
 
         return _tag( $tag, $attr, @cont );
     }
-    elsif ( ref( $value ) eq 'ARRAY' ) {
-        return join( '', map { $self->_xml( $tag, $_, $name_map ) } @{$value} );
+    elsif ( ref $value eq 'ARRAY' ) {
+        return join '', map { $self->_xml( $tag, $_, $name_map ) } @{$value};
     }
     else {
         return _tag( $tag, {}, _enc( $value ) );
@@ -656,7 +645,7 @@ Geo::Gpx - Create and parse GPX files.
 
 =head1 VERSION
 
-This document describes Geo::Gpx version 0.17
+This document describes Geo::Gpx version 0.18
 
 =head1 SYNOPSIS
 
@@ -985,6 +974,41 @@ prints
 
     1.0
 
+=item C<add_waypoint( waypoint ... )>
+
+Add one or more waypoints. Each waypoint must be a reference to a
+hash. Each waypoint must include the keys C<lat> and C<lon> and may
+include others:
+
+    my $wpt = {
+        lat           => 54.786989,
+        lon           => -2.344214,
+        ele           => 512,
+        time          => 1164488503,
+        magvar        => 0,
+        geoidheight   => 0,
+        name          => 'My house & home',
+        cmt           => 'Where I live',
+        desc          => '<<Chez moi>>',
+        src           => 'Testing',
+        link          => {
+            href => 'http://hexten.net/',
+            text => 'Hexten',
+            type => 'Blah'
+        },
+        sym           => 'pin',
+        type          => 'unknown',
+        fix           => 'dgps',
+        sat           => 3,
+        hdop          => 10,
+        vdop          => 10,
+        pdop          => 10,
+        ageofdgpsdata => 45,
+        dgpsid        => 247
+    };
+
+    $gpx->add_waypoint( $wpt );
+
 =item C<iterate_points()>
 
 Get an iterator that visits all the points in a C<Geo::Gpx>. For example
@@ -1088,7 +1112,7 @@ This version by Andy Armstrong  C<< <andy@hexten.net> >>.
 
 =head1 LICENCE AND COPYRIGHT
 
-Copyright (c) 2006, Andy Armstrong C<< <andy@hexten.net> >>. All rights reserved.
+Copyright (c) 2007, Andy Armstrong C<< <andy@hexten.net> >>. All rights reserved.
 
 This module is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself. See L<perlartistic>.
