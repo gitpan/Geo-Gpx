@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Geo-Gpx
-version:             0.20
+version:             0.21
 abstract:            Create and parse GPX files.
 license:             perl
 generated_by:        ExtUtils::MakeMaker version 6.36
