@@ -1,21 +1,27 @@
 --- #YAML:1.0
-name:                Geo-Gpx
-version:             0.21
-abstract:            Create and parse GPX files.
-license:             perl
-generated_by:        ExtUtils::MakeMaker version 6.36
-distribution_type:   module
-requires:     
-    Date::Format:                  0
-    Date::Parse:                   0
-    HTML::Entities:                0
-    Scalar::Util:                  0
-    Test::More:                    0
-    Time::Local:                   0
-    version:                       0
-    XML::Descent:                  0
-meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
-    version: 1.2
+name:               Geo-Gpx
+version:            0.22
+abstract:           Create and parse GPX files.
 author:
     - Andy Armstrong <andy@hexten.net>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Date::Format:    0
+    Date::Parse:     0
+    HTML::Entities:  0
+    Scalar::Util:    0
+    Test::More:      0
+    Time::Local:     0
+    version:         0
+    XML::Descent:    0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
