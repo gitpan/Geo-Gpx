@@ -1,6 +1,6 @@
 ---
 name: Geo-Gpx
-version: 0.25
+version: 0.26
 author:
   - 'Andy Armstrong <andy@hexten.net>'
 abstract: Create and parse GPX files.
@@ -8,7 +8,7 @@ license: perl
 resources:
   bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Gpx
   license: http://dev.perl.org/licenses/
-  repository: https://svn.hexten.net/gpx/Geo-Gpx/trunk
+  repository: git://github.com/AndyA/Geo--Gpx.git
 requires:
   DateTime: 0
   DateTime::Format::ISO8601: 0
@@ -21,7 +21,7 @@ requires:
 provides:
   Geo::Gpx:
     file: lib/Geo/Gpx.pm
-    version: 0.25
+    version: 0.26
 generated_by: Module::Build version 0.33
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
